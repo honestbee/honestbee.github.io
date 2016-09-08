@@ -16,7 +16,7 @@
 title: Honestbee tech blog
 email: tech YOU KNOW honestbee.com
 description: > # this means to ignore newlines until "baseurl:"
-  This is the tech blog for the engineering teams at Honestbee.
+  This is the tech blog for the engineering teams at honestbee.
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "http://tech.honestbee.com" # the base hostname & protocol for your site
 twitter_username: honestbeesg
