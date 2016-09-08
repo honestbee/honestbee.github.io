@@ -11,7 +11,7 @@ Recently we decided to improve the way we manage ssh keys on our servers. We're 
 2. Teams would manage who has access themselves. 
 3. Revoking/Granting access should be immediate. 
 4. Public keys wouldn't be stored in a repository.
-5. Users should be able to access the server from different machines.
+5. Users should be able to access the servers from different machines.
 
 # Solution
 A colleague suggested [this solution][better-ssh]. Using the `AuthorizedKeysCommand` seemed like a perfect solution here. Since public keys of users are available through `https://github.com/<USER>.keys`, we can just download them while trying to connect and override the `authorized_keys` file. 
@@ -39,6 +39,8 @@ else
   echo "Set up GITHUB_TOKEN and GITHUB_TEAM environment variables."
 fi
 {% endhighlight %}
+
+You will need to create a github authorisation token, to which you can just assign read rights on your organisations and ssh keys.
 
 Once this script is added to the server, add the following lines to your `/etc/ssh/sshd_config` file :
 ```
