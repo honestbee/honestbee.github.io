@@ -1,4 +1,4 @@
-# Honestbee tech blog 
+# honestbee tech blog 
 
 This blog is powered by [Jekyll](https://jekyllrb.com/) and [github pages](https://pages.github.com/).
 
