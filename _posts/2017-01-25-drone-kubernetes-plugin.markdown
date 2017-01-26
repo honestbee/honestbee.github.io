@@ -16,6 +16,7 @@ For our core apps, which are ruby monoliths, running the full test suite takes a
 # Existing solutions
 
 Although a [Kubernetes plugin][drone-kubernetes] and [Helm plugin][drone-helm] exist for Drone, these plugins were not satisfying our needs for the following reasons:
+
 - The Kubernetes plugin publishes resources based on a json manifest, but we prefer to use Kubernetes managed Deployments (available since Kubernetes 1.1 ~ 1.2).
 - Same thing with the Helm plugin, it doesn't allow to update an existing Deployment and leverage the built-in rolling updates.
 - The Helm plugin also requires every repository to embed its own Helm chart, and we prefer to manage charts in a centralized repository.
@@ -29,6 +30,7 @@ To be a drone plugin, the kubectl wrapper needs to be available as a Docker cont
 - [The source][drone-k8s] of the plugin is publicly available
 - You may use Docker to get the image: `docker pull quay.io/honestbee/drone-kubernetes`
 - To run the plugin in your Drone pipeline use the following yaml:
+
 ```
 # This will update the my-container-name container in a my-deployment
 # deployment with the ${DRONE_COMMIT_SHA:8} tag of my-registry/my-container
