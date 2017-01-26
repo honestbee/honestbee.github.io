@@ -59,4 +59,46 @@ On the security side, the keys being public, there are only a few ways we can be
 # Fallback 
 In case of failure of the process, sshd falls back by default to the `authorized_keys` file, where we still have one key stored.
 
+# Update January 2017
+
+To reduce the impact of slow GitHub API responses and to ensure timely responses of the script, a few optimisations can be applied as follows:
+
+- Usage of `--connection-timeout` and `--max-time` options in `curl`
+- Usage of a cache on disk with a TTL. A very simple implementation can be
+  achieved with `stat` and `date` commands.
+
+The updated script looks as follows:
+{% highlight bash %}
+#!/bin/bash
+cache_file=/path/to/key_cache
+function dl_keys {
+  curl -m 10 -sf https://github.com/${1}.keys
+}
+
+# Function to cache keys to disk
+function cache_keys {
+  if [[ ! -z $GITHUB_TEAM && ! -z $GITHUB_TOKEN ]]; then
+    users=$(curl -m 10 -sf https://api.github.com/teams/${GITHUB_TEAM}/members -H "Authorization: token ${GITHUB_TOKEN}"|jq -r '.[].login')
+    for i in $users; do
+      dl_keys $i >> $cache_file &
+    done
+    wait
+  else
+    echo "Set up GITHUB_TOKEN and GITHUB_TEAM environment variables."
+  fi
+}
+
+if [[ -f $cache_file ]]; then
+  # only re-cache every 5 minutes
+  if [ $(( $(date +"%s") - $(stat -c %Y $cache_file) )) -gt 300 ]; then
+    rm $cache_file
+    cache_keys
+  fi
+else
+  cache_keys
+fi
+# return contents of cache
+if [[ -f $cache_file ]]; then cat $cache_file; fi
+{% endhighlight %}
+
 [better-ssh]: https://gist.github.com/sivel/c68f601137ef9063efd7
