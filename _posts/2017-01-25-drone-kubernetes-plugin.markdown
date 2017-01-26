@@ -5,22 +5,24 @@ date:   2017-01-25 14:39:00 +0800
 categories: devops aws kubernetes
 author: Charles Martinot
 ---
-As we are installing more and more of our services (and all the new ones) in our [Kubernetes][k8s] cluster, we reached a point where we start moving some of our core apps as well. These being monolithic ruby apps, running the full test suite is a pretty long process : about 15 minutes in Travis
+As we are installing more and more of our existing services (as well as all  new services) in our [Kubernetes][k8s] cluster, we reached a point where we have started moving our core apps as well. We have also adopted [Helm][helm] to manage our Kubernetes deployments. For our core apps, being monolithic ruby apps, running the full test suite takes a considerable amount of time (about 15-20 minutes in Travis).
 
-Adding a Docker build to that process would push it to about 20-25 minutes, even with layer caching. We decided indeed to experiment with in-house building, running our Docker builds in [Drone CI][droneci].
+Adding a Docker build to that process would push the total build time to about 20-25 minutes, even with Image layer caching. As such, we decided to experiment with in-house building and running our Docker builds in [Drone CI][droneci].
 
-There are existing [Drone plugins for Kubernetes][drone-kubernetes] or [Helm][helm], that we are also using, but they were not satisfying our needs for the following reasons : 
-- The Kubernetes plugin publishes artifacts based on a json manifest, however we just want to update existing deployments with a new version of the container, through rolling deploys.
-- Same thing with the Helm plugin, it doesn't allow to update an existing release.
-- The Helm plugin also requires every repository to embed its own Helm chart, and we don't want to manage charts that way but instead have them in a centralized repository.
+Although a [Kubernetes plugin][drone-kubernetes] and [Helm plugin][drone-helm] exist for Drone, these plugins were not satisfying our needs for the following reasons:
+- The Kubernetes plugin publishes resources based on a json manifest, but we prefer to use Kubernetes managed Deployments (available since Kubernetes 1.1 ~ 1.2).
+- Same thing with the Helm plugin, it doesn't allow to update an existing Deployment and leverage the built-in rolling updates.
+- The Helm plugin also requires every repository to embed its own Helm chart, and we prefer to manage charts in a centralized repository.
 
-We decided to write our own plugin, which is very simple and basically wrapping `kubectl` commands. As a drone plugin it needs to be available as a Docker container. 
+We decided to write our own plugin, which is very simple and basically wraps `kubectl` commands. 
 
-- [Here is the source][drone-k8s]
-- Get the container : `docker pull quay.io/honestbee/drone-kubernetes`
-- Run it in your Drone pipeline :
+To be a drone plugin, the kubectl wrapper needs to be available as a Docker container.
+
+- [The source][drone-k8s] of the plugin is publicly available
+- You may use Docker to get the image: `docker pull quay.io/honestbee/drone-kubernetes`
+- To run the plugin in your Drone pipeline use the following yaml:
 ```
-# This will update the my-container-name container in a my-deployment 
+# This will update the my-container-name container in a my-deployment
 # deployment with the ${DRONE_COMMIT_SHA:8} tag of my-registry/my-container
 pipeline:
     deploy:
@@ -31,16 +33,17 @@ pipeline:
       namespace: my-namespace
       tag: ${DRONE_COMMIT_SHA:8}
       when:
-        branch: [ master ]  
+        branch: [ master ]
 ```
 
-# TL;DR 
+# TL;DR
 
-We wrote a Drone CI plugin to update Kubernetes deployments and it's available on [github][drone-k8s]. Also available as a Docker container on [quay.io][quay] : `docker pull quay.io/honestbee/drone-kubernetes`.
+We wrote a Drone CI plugin to update Kubernetes deployments and it's available on [github][drone-k8s]. Also available as a Docker container on [Quay.io][quay] : `docker pull quay.io/honestbee/drone-kubernetes`.
 
 [drone-k8s]: https://github.com/honestbee/drone-kubernetes
 [quay]: https://quay.io/repository/honestbee/drone-kubernetes
 [k8s]: https://kubernetes.io/
 [droneci]: https://github.com/drone/drone
 [drone-kubernetes]: https://github.com/UKHomeOffice-attic/drone-kubernetes
+[drone-helm]: https://github.com/ipedrazas/drone-helm
 [helm]: https://github.com/kubernetes/helm
