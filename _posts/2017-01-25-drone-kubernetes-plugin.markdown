@@ -5,7 +5,7 @@ date:   2017-01-25 14:39:00 +0800
 categories: devops aws kubernetes
 author: Charles Martinot
 ---
-As we are installing more and more of our existing services (as well as all  new services) in our [Kubernetes][k8s] cluster, we reached a point where we have started moving our core apps as well. We have also adopted [Helm][helm] to manage our Kubernetes deployments. For our core apps, being monolithic ruby apps, running the full test suite takes a considerable amount of time (about 15-20 minutes in Travis).
+As we are installing more and more of our existing services (as well as all  new services) in our [Kubernetes][k8s] cluster, we reached a point where we have started moving our core apps as well. We have also adopted [Helm][helm] to manage our Kubernetes deployments. For our core apps, which are ruby monoliths, running the full test suite takes a considerable amount of time (about 15-20 minutes in Travis).
 
 Adding a Docker build to that process would push the total build time to about 20-25 minutes, even with Image layer caching. As such, we decided to experiment with in-house building and running our Docker builds in [Drone CI][droneci].
 
