@@ -101,4 +101,6 @@ fi
 if [[ -f $cache_file ]]; then cat $cache_file; fi
 {% endhighlight %}
 
+**Note**: `curl` does provide a `-z` option, which sends an `If-Modified-Since` Header. However, we verified and confirmed that the GitHub API never returned a  `HTTP/1.1 304 NOT MODIFIED` response and as such we could not use this option.
+
 [better-ssh]: https://gist.github.com/sivel/c68f601137ef9063efd7
