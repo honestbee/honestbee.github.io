@@ -1,27 +1,71 @@
-# Welcome to Jekyll!
 #
-# This config file is meant for settings that affect your whole blog, values
-# which you are expected to set up once and rarely edit after that. If you find
-# yourself editing these this file very often, consider using Jekyll's data files
-# feature for the data you need to update frequently.
+###################################
+# Site wide configuration
+####################################
 #
-# For technical reasons, this file is *NOT* reloaded automatically when you use
-# 'jekyll serve'. If you change this file, please restart the server process.
+title: honestbee
+email:
+description: This blog features articles written by our engineering team.
+url: # the base hostname & protocol for your site
 
-# Site settings
-# These are used to personalize your new site. If you look in the HTML files,
-# you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
-# You can create any custom variable you would like, and they will be accessible
-# in the templates via {{ site.myvariable }}.
-title: honestbee tech blog
-email: tech YOU KNOW honestbee.com
-description: > # this means to ignore newlines until "baseurl:"
-  This is the tech blog for the engineering teams at honestbee.
-baseurl: "" # the subpath of your site, e.g. /blog
-url: "http://tech.honestbee.com" # the base hostname & protocol for your site
-twitter_username: honestbeesg
-github_username: honestbee
+#
+###################################
+# Jekyll configuration
+####################################
+#
+timezone:          Asia/Singapore
+markdown:          kramdown
+highlighter:       rouge
+excerpt_separator: <!--more-->
+permalink:         /articles/:year-:month/:title
 
-# Build settings
-markdown: kramdown
-theme: minima
+kramdown:
+  auto_ids: true
+  footnote_nr: 1
+  entity_output: as_char
+  toc_levels: 1..6
+  enable_coderay: false
+
+#
+###################################
+# Site Owner configuration
+####################################
+#
+owner:
+  name: honestbee
+  avatar: primary-logo.png
+  job:
+  bio: "On Demand Platform. Making lives easy"
+  email: hireme+techblog@honestbee.com
+  disqus-shortname:
+  twitter: honestbeesg
+  facebook: honestbee
+  google:
+    plus:
+    analytics:
+    verify:
+    ad-client:
+    ad-slot:
+  bing-verify:
+  github: honestbee
+  gitlab: #username
+  stackoverflow: #123456/username   from a "http://stackoverflow.com/users/123456/username" link
+  linkedin:
+    company: true
+    username: honestbee
+  skype: #username
+  xing: #username
+  instagram: honestbeesg
+  lastfm: #username
+  tumblr: #username
+  pinterest: #username
+  foursquare: #username
+  steam: #username
+  dribbble: #username
+  youtube: #username
+  soundcloud: #username
+  weibo: #username
+  flickr: #username
+  500px: #username
+  codepen: #username
+  hiring: #url

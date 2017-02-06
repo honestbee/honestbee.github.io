@@ -1,8 +1,10 @@
 ---
 layout: post
 title:  "Getting It Right - Rails Setup"
+excerpt: "Setting up your Rails project correctly is of utmost importance. Obvious setup instructions somehow get missed, and entire teams suffer from the repercussions of a bad setup."
 date:   2017-01-30 11:39 AM
-categories: ruby-on-rails
+categories: [ruby on rails]
+tags: [ruby on rails,rspec]
 author: Mingsheng Gan
 ---
 

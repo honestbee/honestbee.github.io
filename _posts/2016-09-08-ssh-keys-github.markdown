@@ -1,8 +1,10 @@
 ---
 layout: post
 title:  "A clean process to get ssh keys from Github"
+excerpt: "Recently we decided to improve the way we manage ssh keys on our servers. We’re running our stack on Elastic Beanstalk and the way we would push our ssh keys would be to use a config file appending the user’s key to the server’s authorized_keys file. This solution is not really optimal because it means we’re storing the public keys in the repository, access control is quite low and you’d have to go through a whole pull request process just to be able to ssh to a machine."
 date:   2016-09-08 12:13:33 +0800
-categories: devops aws
+categories: [devops]
+tags: [devops,aws]
 author: Charles Martinot, Vincent De Smet
 ---
 Recently we decided to improve the way we manage ssh keys on our servers. We're running our stack on Elastic Beanstalk and the way we would push our ssh keys would be to use a config file appending the user's key to the server's `authorized_keys` file. This solution is not really optimal because it means we're storing the public keys in the repository, access control is quite low and you'd have to go through a whole pull request process just to be able to ssh to a machine.
