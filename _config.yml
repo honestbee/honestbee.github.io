@@ -68,4 +68,6 @@ owner:
   flickr: #username
   500px: #username
   codepen: #username
-  hiring: #url
+  hiring:
+    status: true
+    link: https://honestbee.sg/en/careers
