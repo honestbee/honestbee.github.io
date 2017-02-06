@@ -6,13 +6,13 @@ categories: ruby-on-rails
 author: Mingsheng Gan
 ---
 
-Setting up your Rails project correctly is of utmost importance. Obvious setup instructions somehow gets missed, and entire teams suffer from the repercussions of a bad setup.
+Setting up your Rails project correctly is of utmost importance. Obvious setup instructions somehow get missed, and entire teams suffer from the repercussions of a bad setup.
 
 This post describes some common configuration mistakes specific to the `test-suite` that we have rectified. Simple but essential, we hope that this article helps you improve your codebase and enhance your developmental workflow.
 
 ## 3 Common Setup Mistakes
 
-Learning to observe and having zero tolerance for obvious repetitions go a long way. Most popular gems typically consist of a configuration to simplify its usage. That, we should always keep in mind.
+Having zero tolerance for obvious repetitions go a long way. Most popular gems typically consist of a configuration to simplify its usage and we should always keep that in mind. Here are 3 obvious setup mistakes that we have corrected:
 
 ### Symptom: FactoryGirls littered all over the place
 
