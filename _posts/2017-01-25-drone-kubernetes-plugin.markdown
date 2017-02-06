@@ -1,13 +1,15 @@
 ---
 layout: post
 title:  "A Drone CI plugin for updating deployments in Kubernetes"
+excerpt: "As we are installing more and more of our existing services (as well as all new services) in our Kubernetes cluster, we reached a point where we have started moving our core apps as well"
 date:   2017-01-25 14:39:00 +0800
-categories: devops aws kubernetes
+categories: [devops]
+tags: [devops,aws,kubernetes]
 author: Charles Martinot
 ---
-# Context 
+# Context
 
-As we are installing more and more of our existing services (as well as all  new services) in our [Kubernetes][k8s] cluster, we reached a point where we have started moving our core apps as well. To manage our deployments, we adopted [Helm][helm]. 
+As we are installing more and more of our existing services (as well as all  new services) in our [Kubernetes][k8s] cluster, we reached a point where we have started moving our core apps as well. To manage our deployments, we adopted [Helm][helm].
 
 # Problem
 
@@ -21,9 +23,9 @@ Although a [Kubernetes plugin][drone-kubernetes] and [Helm plugin][drone-helm] e
 - Same thing with the Helm plugin, it doesn't allow to update an existing Deployment and leverage the built-in rolling updates.
 - The Helm plugin also requires every repository to embed its own Helm chart, and we prefer to manage charts in a centralized repository.
 
-# Our plugin 
+# Our plugin
 
-We decided to write our own plugin, which is very simple and basically wraps `kubectl` commands. 
+We decided to write our own plugin, which is very simple and basically wraps `kubectl` commands.
 
 To be a drone plugin, the kubectl wrapper needs to be available as a Docker container.
 
