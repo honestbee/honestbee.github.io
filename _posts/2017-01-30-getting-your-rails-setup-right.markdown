@@ -34,7 +34,7 @@ Keywords such as `create`, `build` or `build_stubbed` are typically used in almo
 
 ### Symptom: RSpec required specifically in every spec file
 
-Do you need to require rails_helper in every file? Or, type `RSpec` before every `describe`?
+Do you need to `require 'rails_helper'` in every spec file? Or, type `RSpec` before every `describe`?
 ```ruby
 # Before: This helper turns up in every room
 require 'rails_helper'
