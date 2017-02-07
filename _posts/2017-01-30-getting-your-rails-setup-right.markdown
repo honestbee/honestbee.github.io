@@ -19,6 +19,7 @@ Having zero tolerance for obvious repetitions go a long way. Most popular gems t
 ### Symptom: FactoryGirls littered all over the place
 
 Have you seen such a codebase?
+
 ```ruby
 # Before: She's everywhere!
 bad_codebase = FactoryGirl.create(:codebase)
@@ -26,6 +27,7 @@ better_codebase = FactoryGirl.create(:codebase, :with_traits)
 ```
 
 Correction: [Configure FactoryGirl properly][configure-factorygirl]
+
 ```ruby
 # After: She's in the closet now
 clean_codebase = create(:codebase)
@@ -37,6 +39,7 @@ Keywords such as `create`, `build` or `build_stubbed` are typically used in almo
 ### Symptom: RSpec required specifically in every spec file
 
 Do you need to `require 'rails_helper'` in every spec file? Or, type `RSpec` before every `describe`?
+
 ```ruby
 # Before: This helper turns up in every room
 require 'rails_helper'
@@ -47,6 +50,7 @@ end
 ```
 
 Correction: [Require rails_helper instead of spec_helper][configure-rspec]
+
 ```
 # /path/to/project/.rspec
 --require rails_helper # instead of spec_helper
@@ -64,12 +68,14 @@ A change which reduces `~3 LOCs across almost each of 97 spec files`. In terms o
 ### Symptom: Having to type `spring` everytime
 
 We use `spring` to speed up our development workflow. To support `rspec`, we use `spring-commands-rspec`.
+
 ```
 # Before: Repetition occurs even in console mode
 ~/my/project/$ spring rspec ./app/helpers/repetition_helper_spec.rb
 ```
 
 Question yourself, [would spring gem developers not have thought of it?][configure-spring]
+
 ```
 $ bundle install
 $ bundle exec spring binstub --all

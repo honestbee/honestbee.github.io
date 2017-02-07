@@ -46,6 +46,7 @@ fi
 You will need to create a github authorisation token, to which you can just assign read rights on your organisations and ssh keys.
 
 Once this script is added to the server, add the following lines to your `/etc/ssh/sshd_config` file :
+
 ```
 AuthorizedKeysCommand <PATH TO SCRIPT>
 # Keep in mind the user you use needs to have the environment variables set up -
