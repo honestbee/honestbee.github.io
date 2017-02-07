@@ -65,7 +65,7 @@ In case of failure of the process, sshd falls back by default to the `authorized
 
 # Update January 2017
 
-To reduce the impact of slow GitHub API responses and to ensure timely responses of the script, a few optimisations can be applied as follows:
+To reduce the impact of slow Github API responses and to ensure timely responses of the script, a few optimisations can be applied as follows:
 
 - Usage of `--connection-timeout` and `--max-time` options in `curl`
 - Usage of a cache on disk with a TTL. A very simple implementation can be
