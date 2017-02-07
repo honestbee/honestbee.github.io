@@ -55,7 +55,8 @@ AuthorizedKeysCommandUser <USER>
 ```
 
 # Security
-On the security side, the keys being public, there are only a few ways we can be attacked :
+On the security side, the keys being public, there are only a few ways we can be attacked:
+
 - Github being spoofed and serving public keys that are matching the attacker's private key - unlikely
 - Our github account being hacked and a malicious user being added to the teams in order to get access
 
