@@ -16,7 +16,7 @@ At [honestbee](https://honestbee.sg), we recently wanted to collect data from ou
 
 ## App Scripts
 
-The solution we came up with was to build a small web application with a image uploader. The interesting thing was - the web application runs on top of Google Sheets. So no need to deploy it anywhere. You can even reference the Google Sheets values inside the html application using [Google Sheets API](https://developers.google.com/sheets/)
+The solution we came up with was to build a small web application with an image uploader. The interesting thing was - the web application runs on top of Google Sheets. So no need to deploy it anywhere. You can even reference the Google Sheets values inside the html application using [Google Sheets API](https://developers.google.com/sheets/)
 
 ## Script Editor
 
@@ -37,7 +37,7 @@ function doGet(e) {
   var queryString = e.queryString;
 }
 ```
-You also get the query string passed in the URL. Do note that the queryString you get is a string. You will need to parse it in order to retreive the `key=value` pairs.
+You also get the query string passed in the URL. Do note that the queryString you get is a string. You will need to parse it in order to retrieve the `key=value` pairs.
 
 ## HTML file
 
