@@ -19,7 +19,7 @@ Recently we decided to improve the way we manage ssh keys on our servers. We're 
 # Solution
 A colleague suggested [this solution][better-ssh]. Using the `AuthorizedKeysCommand` seemed like a perfect solution here. Since public keys of users are available through `https://github.com/<USER>.keys`, we can just download them while trying to connect and override the `authorized_keys` file.
 
-Here is the script we use to get the users from the right teams in our github organisation :
+Here is the script we use to get the users from the right teams in our Github organisation :
 {% highlight bash %}
 #!/bin/bash
 
@@ -43,7 +43,7 @@ else
 fi
 {% endhighlight %}
 
-You will need to create a github authorisation token, to which you can just assign read rights on your organisations and ssh keys.
+You will need to create a Github authorisation token, to which you can just assign read rights on your organisations and ssh keys.
 
 Once this script is added to the server, add the following lines to your `/etc/ssh/sshd_config` file :
 
@@ -55,16 +55,17 @@ AuthorizedKeysCommandUser <USER>
 ```
 
 # Security
-On the security side, the keys being public, there are only a few ways we can be attacked :
+On the security side, the keys being public, there are only a few ways we can be attacked:
+
 - Github being spoofed and serving public keys that are matching the attacker's private key - unlikely
-- Our github account being hacked and a malicious user being added to the teams in order to get access
+- Our Github account being hacked and a malicious user being added to the teams in order to get access
 
 # Fallback
 In case of failure of the process, sshd falls back by default to the `authorized_keys` file, where we still have one key stored.
 
 # Update January 2017
 
-To reduce the impact of slow GitHub API responses and to ensure timely responses of the script, a few optimisations can be applied as follows:
+To reduce the impact of slow Github API responses and to ensure timely responses of the script, a few optimisations can be applied as follows:
 
 - Usage of `--connection-timeout` and `--max-time` options in `curl`
 - Usage of a cache on disk with a TTL. A very simple implementation can be
