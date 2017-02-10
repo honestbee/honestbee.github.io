@@ -17,7 +17,7 @@ timezone:          Asia/Singapore
 markdown:          kramdown
 highlighter:       rouge
 excerpt_separator: <!--more-->
-permalink:         /articles/:year-:month/:title
+permalink:         /articles/:categories/:year-:month/:title
 
 kramdown:
   auto_ids: true
@@ -71,3 +71,19 @@ owner:
   hiring:
     status: true
     link: https://honestbee.sg/en/careers
+
+#
+###################################
+# Authors
+####################################
+#
+authors:
+  Charles Martinot:
+    linkedin: charlesmartinot
+    twitter:
+  Mingsheng Gan:
+    linkedin: mingsheng-gan-92b23028
+    twitter:
+  Vincent De Smet:
+    linkedin: vincentds
+    twitter:

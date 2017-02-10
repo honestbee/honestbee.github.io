@@ -2,6 +2,9 @@
 layout: default
 ---
 
+{% assign authors = page.author | split: ',' %}
+{% assign authors_bio = site.authors %}
+{% assign author_count = 0 %}
 <a class="btn" href= "{{ site.url }}/" >
   Home
 </a>
@@ -26,12 +29,32 @@ layout: default
   <header class="post-header">
     <h1 title="{{ page.title }}">{{ page.title }}</h1>
     <span class="post-meta">
-      <span class="post-date">
-        {{ page.date | date: "%-d %b %Y" | upcase }}
+      <span class="post-author">
+        {% for article_author in authors %}
+          {% if author_count > 0 %}
+            <span>, </span>
+          {% endif %}
+          {% assign article_author = article_author | strip %}
+          {% assign author_bio = authors_bio[article_author] %}
+          {% if author_bio %}
+            {% if author_bio.linkedin %}
+              <a class="author-link" href="https://www.linkedin.com/in/{{ author_bio.linkedin }}" title="{{ page.author }}" target="_blank">
+                {{ article_author }}
+              </a>
+            {% elsif author_bio.twitter %}
+              <a class="author-link" href="https://twitter.com/{{ author_bio.twitter }}" title="Follow {{ page.author }} on Twitter" target="_blank">
+                {{ article_author }}
+              </a>
+            {% endif %}
+          {% else %}
+            {{ article_author }}
+          {% endif %}
+          {% assign author_count = authour_count | plus: 1 %}
+        {% endfor %}
       </span>
       •
-      <span class="post-author">
-        {{ page.author}}
+      <span class="post-date">
+        {{ page.date | date: "%-d %b %Y" | upcase }}
       </span>
       •
       {% include read_time.html %}

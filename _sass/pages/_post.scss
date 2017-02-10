@@ -69,6 +69,11 @@ section.post {
 	.post-author {
 		text-transform: uppercase;
 		color: $warning;
+
+    .author-link{
+      color: $warning;
+      text-decoration: underline;
+    }
 	}
   .post-cat {
 		text-transform: uppercase;
