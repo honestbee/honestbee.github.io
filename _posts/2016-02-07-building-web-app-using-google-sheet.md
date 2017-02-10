@@ -1,14 +1,14 @@
 ---
 layout: post
-title:  "Building a web app using Google Sheet"
-excerpt: "Build a web app using Google sheet backend and host it on Google cloud infrastructure for free"
+title:  "Building a web app using Google Sheets"
+excerpt: "Build a web app using Google Sheets backend and host it on Google cloud infrastructure for free"
 date:   2017-02-09 19:04:33 +0800
 categories: [integrations]
 tags: [google,google-sheet]
 author: Taher Dhilawala
 ---
 
-I am sure we all use and love Google sheets. But I think very few know that we can actually build a small web application on top of Google sheets (leveraging Google cloud infrastructure) using [Google App Scripts](https://developers.google.com/apps-script/)
+I am sure we all use and love Google Sheets. But I think very few know that we can actually build a small web application on top of Google Sheets (leveraging Google cloud infrastructure) using [Google App Scripts](https://developers.google.com/apps-script/)
 
 ## Background
 
@@ -16,11 +16,11 @@ At [honestbee](https://honestbee.sg), we recently wanted to collect data from ou
 
 ## App Scripts
 
-The solution we came up with was to build a small web application with a image uploader. The interesting thing was - the web application runs on top of Google sheet. So no need to deploy it anywhere. You can even reference the Google sheet values inside the html application using [Google Sheet API](https://developers.google.com/sheets/)
+The solution we came up with was to build a small web application with a image uploader. The interesting thing was - the web application runs on top of Google Sheets. So no need to deploy it anywhere. You can even reference the Google Sheets values inside the html application using [Google Sheets API](https://developers.google.com/sheets/)
 
 ## Script Editor
 
-Start by opening the script editor from Google sheet as shown below
+Start by opening the script editor from Google Sheets as shown below
 
 ![img](/img/posts/web_app_google_sheet/script_editor.png)
 
@@ -117,7 +117,7 @@ You need to set the following
 
 * **Project version**: For every new deploy you need to increment the project version and give a comment (just like git, its for versioning)
 
-* **Execute the app as**: Since this app will be running inside the google sheet context, you need to specify under what user this app runs. It can be either you (the developer) or the user who is accessing the sheet.
+* **Execute the app as**: Since this app will be running inside the Google Sheets context, you need to specify under what user this app runs. It can be either you (the developer) or the user who is accessing the sheet.
 
 * **Access**: Finally, you can also restrict who can access this web app. Options are `Only myself` and `Anyone`. If you choose to execute the app as `Me` then you also get the third option here, which is `Anyone, even anonymous`. Since its your user, people can use it without having to authenticate with Google.
 
@@ -131,11 +131,11 @@ Now lets navigate to the URL and pass name as query string. Also, you can test t
 
 Voila!!
 
-## Google sheet integration
+## Google Sheets integration
 
-So far so good, right? Well, what would be more awesome is that we can store web app values in Google sheet.
+So far so good, right? Well, what would be more awesome is that we can store web app values in Google Sheets.
 
-Doing that is quite easy using the Google sheet API. In your `Code.gs` you can access the active sheet like this,
+Doing that is quite easy using the Google Sheets API. In your `Code.gs` you can access the active sheet like this,
 
 ```
 function setSheetValue(value){
@@ -156,8 +156,6 @@ if(google && google.script){
 
 ## Summary
 
-Since you can do HTML and Javascript, you have endless possibilities here. With powerful Google sheet API and its integration with Google cloud hosting, you can build a simple HTML web app with Google sheet as your database.
+Since you can do HTML and Javascript, you have endless possibilities here. With powerful Google Sheets API and its integration with Google cloud hosting, you can build a simple HTML web app with Google Sheets as your database.
 
 Go try it out :)
-
-Like what you see? Come join us and be part of an amazing team. [We are hiring](https://honestbee.sg/en/careers)
