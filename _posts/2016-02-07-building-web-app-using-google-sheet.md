@@ -12,11 +12,11 @@ I am sure we all use and love Google sheets. But I think very few know that we c
 
 ## Background
 
-At [honestbee](https://honestbee.sg), we recently wanted to collect data from our partners, who are not tech savvy. So, we created a simple spreadsheet for them to be able to add their data. There can be no argument about spreadsheet being the most simplest way of collecting data without any hassle. But, the data we were collecting also had images. A usual way of collecting images would be to ask the partners to zip everything and name the image files same as the key column in the excel. But as I said, they are not tech savvy and this process is prone to errors. So, we needed a way for them to upload images so that it gets stored directly on our servers. All this, without them leaving the comfort of Google spreadsheet
+At [honestbee](https://honestbee.sg), we recently wanted to collect data from our partners, who are not tech savvy. So, we created a simple spreadsheet for them to be able to add their data. There can be no argument about spreadsheets being the most simplest way of collecting data without any hassle. But, the data we were collecting also had images. A usual way of collecting images would be to ask the partners to zip everything and name the image files same as the key column in the excel spreadsheet. But as I said, they are not tech savvy and this process is prone to errors. So, we needed a way for them to upload images so that it gets stored directly on our servers. All this, without them leaving the comfort of Google spreadsheet
 
 ## App Scripts
 
-The solution we came up with was to build a small web application with a image uploader. The interesting thing was - the web application runs on top of Google sheet. So no need to deploy it anywhere. You can even reference the Google sheet values inside the html application using [Google Sheet API](https://developers.google.com/sheets/)
+The solution we came up with was to build a small web application with an image uploader. The interesting thing was - the web application runs on top of Google sheet. So no need to deploy it anywhere. You can even reference the Google sheet values inside the html application using [Google Sheet API](https://developers.google.com/sheets/)
 
 ## Script Editor
 
@@ -37,7 +37,7 @@ function doGet(e) {
   var queryString = e.queryString;
 }
 ```
-You also get all the query string passed in the URL. Do note that the queryString you get is a complete string. You will need to parse it in order to get `key=value` format.
+You also get the query string passed in the URL. Do note that the queryString you get is a string. You will need to parse it in order to retreive the `key=value` pairs.
 
 ## HTML file
 
@@ -51,7 +51,7 @@ var htmlOutput = htmlTemplate.evaluate().setSandboxMode(HtmlService.SandboxMode.
 return htmlOutput;
 ```
 
-What we are doing here is, telling Google that render the given html template in an IFRAME.
+The above snippets tells Google to render the given html template in an IFRAME.
 
 ## The Web application
 
@@ -105,7 +105,7 @@ And my HTML code
 </html>
 ```
 
-The cool part is, you can pass the variables from google script to html file.
+The cool part to highlight above is the fact that we can pass the variables from the google script to html template.
 
 Lets publish it!
 
@@ -115,7 +115,7 @@ Lets publish it!
 
 You need to set the following
 
-* **Project version**: For every new deploy you need to increment the project version and give a comment (just like git, its for versioning)
+* **Project version**: For every new deploy you need to increment the project version and give a comment (just like git, it's for versioning)
 
 * **Execute the app as**: Since this app will be running inside the google sheet context, you need to specify under what user this app runs. It can be either you (the developer) or the user who is accessing the sheet.
 
@@ -142,7 +142,7 @@ function setSheetValue(value){
   var doc = SpreadsheetApp.getActive();
   var sheet = doc.getSheetByName("Sheet 1");
   var range = sheet.getRange("Sheet 1!B2");
-  rang.setValue(value);
+  range.setValue(value);
 }
 ```
 
@@ -156,7 +156,7 @@ if(google && google.script){
 
 ## Summary
 
-Since you can do HTML and Javascript, you have endless possibilities here. With powerful Google sheet API and its integration with Google cloud hosting, you can build a simple HTML web app with Google sheet as your database.
+Since you can do HTML and Javascript, you have endless possibilities here. With powerful Google sheet API and its integration with Google cloud hosting, you can build a simple HTML web app with Google a sheet as your database.
 
 Go try it out :)
 
