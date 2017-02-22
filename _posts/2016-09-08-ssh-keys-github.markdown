@@ -19,7 +19,7 @@ Recently we decided to improve the way we manage ssh keys on our servers. We're 
 # Solution
 A colleague suggested [this solution][better-ssh]. Using the `AuthorizedKeysCommand` seemed like a perfect solution here. Since public keys of users are available through `https://github.com/<USER>.keys`, we can just download them while trying to connect and override the `authorized_keys` file.
 
-Here is the script we use to get the users from the right teams in our Github organisation :
+Here is the script we use to get the users from the right teams in our Github organisation:
 {% highlight bash %}
 #!/bin/bash
 
@@ -31,7 +31,7 @@ function dl_keys {
 # GITHUB_TEAM is the team UID
 # GITHUB_TOKEN is the token used for authentication
 if [[ ! -z $GITHUB_TEAM && ! -z $GITHUB_TOKEN ]]; then
-  users=$(curl -sf https://api.github.com/teams/${GITHUB_TEAM}/members -H "Authorization: token ${GITHUB_TOKEN}"|jq -r '.[].login')
+  users=$(curl -sf https://api.github.com/teams/${GITHUB_TEAM}/members?per_page=100 -H "Authorization: token ${GITHUB_TOKEN}"|jq -r '.[].login')
 
   for i in $users; do
     dl_keys $i &
@@ -82,7 +82,7 @@ function dl_keys {
 # Function to cache keys to disk
 function cache_keys {
   if [[ ! -z $GITHUB_TEAM && ! -z $GITHUB_TOKEN ]]; then
-    users=$(curl -m 10 -sf https://api.github.com/teams/${GITHUB_TEAM}/members -H "Authorization: token ${GITHUB_TOKEN}"|jq -r '.[].login')
+    users=$(curl -m 10 -sf https://api.github.com/teams/${GITHUB_TEAM}/members?per_page=100 -H "Authorization: token ${GITHUB_TOKEN}"|jq -r '.[].login')
     for i in $users; do
       dl_keys $i >> $cache_file &
     done
