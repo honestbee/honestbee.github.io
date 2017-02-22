@@ -45,6 +45,8 @@ fi
 
 You will need to create a Github authorisation token, to which you can just assign read rights on your organisations and ssh keys.
 
+Note that by default the GitHub API returns 30 items per page for the Team Members endpoint. The maximum items per page in a response is 100, which is more than sufficient for our current needs. If our team member count goes over 100, we will need to add a paging loop to the script above.
+
 Once this script is added to the server, add the following lines to your `/etc/ssh/sshd_config` file :
 
 ```
