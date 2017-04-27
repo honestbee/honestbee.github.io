@@ -1,10 +1,9 @@
 ---
 layout: post
 title:  "Using Enums (like Rails) in Elixir"
-excerpt: "Ecto in Elixir does not support Enums which is heavily used in Rails. "
-date:   2017-04-28 02:14:00 +0800
+excerpt: "Ecto in Elixir does not support enums which is heavily used in Rails. But using macro, we can create custom enums"
 categories: [elixir]
-tags: [elixir,ecto]
+tags: [elixir,ecto,phoenixframework]
 author: Taher Dhilawala
 ---
 
