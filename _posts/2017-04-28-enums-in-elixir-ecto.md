@@ -86,7 +86,7 @@ Now we have the value in the quoted expression which is what we want.
 
 ### Enum macro
 
-To create a `enum` in elixir, I created a macro, that would take the name of the enum and a block which will contain the values (a map)
+To create a `enum` in Elixir, I created a macro, that would take the name of the enum and a block which will contain the values (a map)
 
 ```
 defmacro enum(name, [do: block]) do
@@ -141,9 +141,9 @@ enum_values =
   end
 ```
 
-If the case statement above looks alien, then read up a bit about [case](http://elixir-lang.org/getting-started/case-cond-and-if.html#case) and [pattern matching](http://elixir-lang.org/getting-started/pattern-matching.html) in elixir.
+If the case statement above looks alien, then read up a bit about [case](http://elixir-lang.org/getting-started/case-cond-and-if.html#case) and [pattern matching](http://elixir-lang.org/getting-started/pattern-matching.html) in Elixir.
 
-Remember that everything in elixir is represented as a three element tuple? Our do block is passed to our macro function as a tuple with the third element as our map in a keyword list (the check in the when clause). So if the format is correct, we pattern match and fetch the value map which is used as a return value of the function. If we pass something else other than a map, the pattern matching fails and the enum value is set with an error tuple. So when you try to fetch the enum value, you will get an error.
+Remember that everything in Elixir is represented as a three element tuple? Our do block is passed to our macro function as a tuple with the third element as our map in a keyword list (the check in the when clause). So if the format is correct, we pattern match and fetch the value map which is used as a return value of the function. If we pass something else other than a map, the pattern matching fails and the enum value is set with an error tuple. So when you try to fetch the enum value, you will get an error.
 
 Here is the complete code
 
