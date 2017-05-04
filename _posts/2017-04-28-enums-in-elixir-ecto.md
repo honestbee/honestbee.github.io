@@ -86,7 +86,7 @@ Now we have the value in the quoted expression which is what we want.
 
 ### Enum macro
 
-To create a `enum` in Elixir, I created a macro, that would take the name of the enum and a block which will contain the values (a map)
+To create an `enum` in Elixir, I created a macro, that would take the name of the enum and a block which will contain the values (a map)
 
 ```
 defmacro enum(name, [do: block]) do
@@ -127,7 +127,7 @@ end
 
 What we did here is, created a quoted expression which contains a function with enum name and it returns the enum value map.
 
-Lets get he enum values from the do block
+Lets get the enum values from the do block
 
 ```
 enum_values =
