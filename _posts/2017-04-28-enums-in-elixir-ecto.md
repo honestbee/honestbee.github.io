@@ -148,21 +148,51 @@ Remember that everything in Elixir is represented as a three element tuple? Our 
 Here is the complete code
 
 ```
-defmacro enum(name, [do: block]) do
-  enum_values = case block do
-      {_, _, values} when is_list(values) ->
-          values
-      _ ->
-          quote do
-            {:error, "please provide Map with %{key: value} for enum"}
-          end
-  end
+defmodule EnumsHelper do
+  @moduledoc false
 
-  quote do
-      def unquote(:"#{name}")() do
-          unquote(enum_values)
-      end
+  defmacro enum(name, [do: block]) do
+    enum_values = case block do
+        {_, _, values} when is_list(values) ->
+            values
+        _ ->
+            quote do
+              {:error, "please provide Map with %{key: value} for enum"}
+            end
+    end
+
+    quote do
+        def unquote(:"#{name}")() do
+            unquote(enum_values)
+        end
+    end
   end
+end
+```
+
+In your model module, you can define your enum by importing the helper
+
+```
+defmodule User do
+  @moduledoc false
+
+  import EnumsHelper
+
+  enum "status" do
+    %{
+      active: 1,
+      inactive: 2
+    }
+  end
+end
+```
+
+You can then use your status enum like,
+
+```
+my_user = User |> Repo.get(1)
+if my_user.status == User.status[:active] do
+  # do stuff
 end
 ```
 
