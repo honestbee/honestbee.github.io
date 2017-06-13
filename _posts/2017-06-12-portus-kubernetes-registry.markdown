@@ -42,7 +42,7 @@ kops create cluster c01.example.com \
 kops update cluster c01.example.com --yes
 ```
 
-Once the cluster is available, ensure to install locally and initialise Helm in the cluster.
+Once the cluster is available, ensure to install the Helm cli locally and initialise Helm in the cluster.
 
 ```
 brew install kubernetes-helm
