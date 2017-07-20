@@ -35,7 +35,7 @@ A powerful [Helm plugin for Drone](https://github.com/ipedrazas/drone-helm) alre
 
 In the next 2 section we will detail how we:
 
-- Create and manage our private Chart Repository and
+- Create and manage our private Chart Repository
 - How we use this Chart Repository within our Drone pipelines (we will also provide a public sample project).
 
 ### Creating and Managing a private Chart Repository
