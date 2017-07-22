@@ -27,7 +27,7 @@ As we do not want our Helm Charts to live within each project directory and pref
 
 For this to fully work, Helm defines the concept of a central [Chart repository](https://docs.helm.sh/developing_charts/#syncing-your-chart-repository) which is very similar to the central [Docker Registry](https://docs.docker.com/registry/) used for Container Image distribution.
 
-A Chart repository mainly consists of static assets (Although a proposal exists to treat Charts more like Container images and [re-use the existing technology used to manage image distribution](https://coreos.com/blog/quay-application-registry-for-kubernetes.html)). Any static file host (github.io / s3 / GCS / ... ) can be used, additionally - support for [auth has recently been added](https://github.com/kubernetes/helm/issues/1038) to Helm. We just have to have a pipeline to package the charts and synchronize them to the host for every change.
+A Chart repository mainly consists of static assets (Although a proposal exists to treat Charts more like Container images and [re-use the existing technology used to manage image distribution](https://coreos.com/blog/quay-application-registry-for-kubernetes.html)). Any static file host (github.io / s3 / GCS / ... ) can be used, additionally - support for [auth has recently been added](https://github.com/kubernetes/helm/issues/1038) to Helm. We just need to have a pipeline to package the charts and synchronize them to the host for every change.
 
 Next, our Drone pipelines must have a task to pull the specified Helm Chart from the Chart Repository and install or upgrade a Project's target release (Dev / Staging / Prod) within a Kubernetes cluster. For these type of pipeline tasks, which are highly re-usable across pipelines, Drone uses the concept of a [plugin](http://docs.drone.io/plugin-overview/) making them fully declarative and easily controlled through configuration.
 
@@ -42,13 +42,13 @@ In the next 2 section we will detail how we:
 
 As we are on AWS, we use s3 to host our Chart Repository, our configuration is fully defined as code using [Terraform](https://terraform.io).
 
-Other clouds provide similar services and the below set up may be replicated there as needed.
+Other clouds provide similar services and the setup below may be replicated there as needed.
 
 After the storage service has been configured, we will cover how Drone is used to synchronize our Git repositories with our Helm Repository.
 
 ![vpc-endpoint](https://image.slidesharecdn.com/amazonvpcwebinar-150527181628-lva1-app6891/95/aws-may-webinar-series-deep-dive-amazon-virtual-private-cloud-57-638.jpg?cb=1432848918)
 
-Technically, We'll create a `VPC endpoint` (which named `vpce-xxxx`), and route the traffic  from clients / specific VPC towards S3 need to be passed through this one.
+Technically, we'll create a `VPC endpoint` (named `vpce-xxxx`), and route the traffic  from clients / specific VPC towards S3 need to be passed through this one.
 
 #### Create vpc endpoint
 Firstly, we need to create `vpc endpoint` to allow private access to bucket used as private chart repository.
@@ -254,7 +254,7 @@ pipeline:
 
 Once a Chart repository has been configured, we can use it with helm.
 
-To illustrate how we use a Helm Repository, lets see go through the manual steps first.
+To illustrate how we use a Helm Repository, lets go through the manual steps first.
 
 The repository has to be added to our Helm configuration:
 
