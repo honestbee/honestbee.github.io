@@ -7,63 +7,84 @@ tags: [kubernetes, devops, aws]
 author: Tuan Nguyen,Vincent De Smet
 ---
 
+### TL;DR
+
+We use Helm and released a Drone plugin to set up CI/CD for a private Helm Repository backed by S3. PRs to [add support for other storage services](https://github.com/honestbee/drone-helm-repo/tree/master/pkg/storage) welcome!
+
 ## Context
 
-At Honestbee we fully adopted [Helm](https://helm.sh) since late 2016 and are always focused on providing value back to the community developing these awesome open source projects.
+At Honestbee we fully adopted [Helm](https://helm.sh) since late 2016 and are always looking to provide value back to the Kubernetes community.
 
-Early on, we distilled existing best practices into a summary [Helm Best Practices](https://gist.github.com/so0k/f927a4b60003cedd101a0911757c605a) document (which was well-received, but has since been superseded by the excellent [Upstream - Helm Best Practices](https://docs.helm.sh/chart_best_practices/#the-chart-best-practices-guide) guide). We also always try to contribute to the upstream Helm Charts for the open source projects we use such as [Locust](https://kubeapps.com/charts/stable/locust), [Portus](/articles/devops/2017-06/portus-kubernetes-registry), [Fluentd](https://github.com/fluent/fluentd-kubernetes-daemonset/pull/4) and [Cloudflare-datadog](https://github.com/kubernetes/charts/pull/1324).
+Early on, we distilled existing best practices into a summary [Helm Best Practices](https://gist.github.com/so0k/f927a4b60003cedd101a0911757c605a) document (the new [Upstream - Helm Best Practices](https://docs.helm.sh/chart_best_practices/#the-chart-best-practices-guide) now supersede this document). We also always try to contribute to the upstream Helm Charts for the open source projects we use such as [Locust](https://kubeapps.com/charts/stable/locust), [Portus](/articles/devops/2017-06/portus-kubernetes-registry), [Fluentd](https://github.com/fluent/fluentd-kubernetes-daemonset/pull/4) and [Cloudflare-datadog](https://github.com/kubernetes/charts/pull/1324).
 
 Another open source project we heavily rely on is [Drone.io](http://docs.drone.io/getting-started/), which is now handling CI/CD for most of our applications. Drone allows us to fully automate our application deployments into our Kubernetes clusters. A while back we also open sourced our [Drone Kubernetes plug-in](/articles/devops/2017-01/drone-kubernetes-plugin).
 
-This post assumes familiarity with [Kubernetes](https://kubernetes.io) and some [Helm Concepts](https://docs.helm.sh/developing_charts/#charts).
+In this article we provide more details on how we use Helm internally as well as give an overview of a new Drone plugin we just open sourced: [honestbee/drone-helm-repo](https://github.com/honestbee/drone-helm-repo).
 
-## Overview and Motivations behind our Set up
+Familiarity with [Kubernetes](https://kubernetes.io) and [Helm Charts](https://docs.helm.sh/developing_charts/#charts) is required to follow along.
 
-Helm's templating features to facilitate the installation of our workloads on top of Kubernetes drove our initial adoption, but Helm has a lot more to offer!
+## Overview and Motivations behind our Setup
 
-In our initial set up for our team of two, we relied on a central git repository of Helm Charts which both of us kept a local copy off. Deployment secrets were handled manually outside of this repository. As the team grew and secrets were managed manually, mistakes could easily be made while changing the configuration of releases managed by Helm. Kubernetes often stopped faulty updates as soon as the first [health checks failed](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/) and Helm's release management provided us powerful roll backs. However, we saw the need to fully automate releases with Helm and the first step towards this was to stop updating Kubernetes deployments directly from Drone, ensuring Helm had full control over every new release from within our Drone CI/CD Pipelines.
+Helm's templating features to facilitate the installation of our applications on top of our Kubernetes clusters drove initial adoption of Helm at Honestbee, but Helm is also a powerfull release manager.
 
-As we do not want our Helm Charts to live within each project directory and prefer to have Deployment artifacts de-coupled from the project (each project packages as a container image, how this container image is deployed is managed separately and may change over time). Deployments can also cross multiple projects and make use of Helm's Chart dependency mechanisms.
+In our initial set up for our team of two, we relied on a central git repository of Helm Charts which both of us kept a local copy off. Deployment secrets were handled manually outside of this repository. 
 
-For this to fully work, Helm defines the concept of a central [Chart repository](https://docs.helm.sh/developing_charts/#syncing-your-chart-repository) which is very similar to the central [Docker Registry](https://docs.docker.com/registry/) used for Container Image distribution.
+As the team grew and secrets were managed manually, mistakes were easily made while upgrading Chart Releases. Although Kubernetes often stopped faulty updates as soon as the first [health checks failed](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/) and Helm provided powerful roll backs, we saw the need to fully automate releases with Helm. The first step towards this was to stop updating Kubernetes deployments directly from Drone and instead ensure Helm had full control over every new release.
 
-A Chart repository mainly consists of static assets (Although a proposal exists to treat Charts more like Container images and [re-use the existing technology used to manage image distribution](https://coreos.com/blog/quay-application-registry-for-kubernetes.html)). Any static file host (github.io / s3 / GCS / ... ) can be used, additionally - support for [auth has recently been added](https://github.com/kubernetes/helm/issues/1038) to Helm. We just need to have a pipeline to package the charts and synchronize them to the host for every change.
+We choose not to have Helm Charts living within each project directory and prefer to have Deployment artifacts de-coupled from projects (each project packages as a container image and how this container image is deployed is managed separately and may change over time). Deployments can also cross multiple projects and make use of Helm's Chart dependency mechanisms.
 
-Next, our Drone pipelines must have a task to pull the specified Helm Chart from the Chart Repository and install or upgrade a Project's target release (Dev / Staging / Prod) within a Kubernetes cluster. For these type of pipeline tasks, which are highly re-usable across pipelines, Drone uses the concept of a [plugin](http://docs.drone.io/plugin-overview/) making them fully declarative and easily controlled through configuration.
+Here's a picture of our desired workflow:
 
-A powerful [Helm plugin for Drone](https://github.com/ipedrazas/drone-helm) already existed, but lacked the support to work with centralized Chart Repositories. We recently forked and added this support and are working to upstream these changes.
+![Drone Helm Overview](/img/posts/drone_helm_repo/overview.png)
 
-In the next 2 section we will detail how we:
+For this to fully work, Helm defines the concept of a central [Chart repository](https://docs.helm.sh/developing_charts/#syncing-your-chart-repository) which is very similar to the central [Registry](https://docs.docker.com/registry/) Docker uses for Container Image distribution.
+
+For Helm, a Chart repository mainly consists of static assets (Although a proposal exists to treat Charts more like Container images and [re-use the existing technology used to manage image distribution](https://coreos.com/blog/quay-application-registry-for-kubernetes.html)). Any static file host (github.io / s3 / GCS / ... ) can be used, additionally - support for [auth has recently been added](https://github.com/kubernetes/helm/issues/1038) as well. We just need to have a pipeline to package the charts and synchronize them to the hosting service each time a Chart definition changes (purple pipeline above).
+
+Next, our Drone pipelines must have a task to pull the specified Helm Chart from the Chart Repository and install or upgrade a matching release (Dev / Staging / Prod) within a Kubernetes cluster (green pipeline above). For these type of build tasks, which are highly re-usable across pipelines, Drone uses the concept of [plugins](http://docs.drone.io/plugin-overview/). Plugins make build tasks fully declarative and easily controlled through configuration (as we'll see in the snippets below).
+
+A powerful [Helm plugin for Drone](https://github.com/ipedrazas/drone-helm) already existed, but lacked the support to work with centralized Chart Repositories. We recently [forked](https://github.com/honestbee/drone-helm) and added this support and are working to upstream these changes.
+
+In the next 2 sections we detail how we:
 
 - Create and manage our private Chart Repository
-- How we use this Chart Repository within our Drone pipelines (we will also provide a public sample project).
+- Use this Chart Repository within our Drone pipelines (we also provide a public sample project: [honestbee/hello-drone-helm](https://github.com/honestbee/hello-drone-helm)).
 
 ### Creating and Managing a private Chart Repository
 
-As we are on AWS, we use s3 to host our Chart Repository, our configuration is fully defined as code using [Terraform](https://terraform.io).
+As we are on AWS, we use s3 to host our Chart Repository. Our configuration is defined as code using [Terraform](https://terraform.io) and relevant snippets are shared as we walk through the setup.
 
-Other clouds provide similar services and the setup below may be replicated there as needed.
+Other Cloud providers have similar services (GCS / Azure Blob Storage / ...) and the setup below may be replicated there as applicable.
 
-After the storage service has been configured, we will cover how Drone is used to synchronize our Git repositories with our Helm Repository.
+After the storage service has been configured, we will cover how Drone is used to synchronize our Helm Charts Git repository with our Helm Repository and how our Helm Releases are upgraded from this Private Helm repository.
 
-![vpc-endpoint](https://image.slidesharecdn.com/amazonvpcwebinar-150527181628-lva1-app6891/95/aws-may-webinar-series-deep-dive-amazon-virtual-private-cloud-57-638.jpg?cb=1432848918)
+#### Keeping Charts Private with AWS VPCs
 
-Technically, we'll create a `VPC endpoint` (named `vpce-xxxx`), and route the traffic  from clients / specific VPC towards S3 need to be passed through this one.
+To keep our S3 backed Repo private, we choose to:
 
-#### Create vpc endpoint
-Firstly, we need to create `vpc endpoint` to allow private access to bucket used as private chart repository.
+- Create a `vpc endpoint`, 
+- Only [allow s3 bucket access via the endpoint](https://stackoverflow.com/questions/25539057/restricting-s3-bucket-access-to-a-vpc) (using `aws:SourceVPC` access policies) 
+
+  and 
+- Route traffic from clients and other VPCs towards S3 through this endpoint.
+
+This diagram from the Amazon Deep Dive Webinar on VPCs illustrates this set up:
+
+![vpc-endpoint](/img/posts/drone_helm_repo/vpc-endpoint-webinar.jpg)
+
+Create the endpoint using aws cli:
 
 ```bash
-aws ec2 create-vpc-endpoint --vpc-id <allowed-vpc-id> --service-name com.amazonaws.ap-southeast-1.s3 --route-table-ids rtb-11aa22bb
+$ aws ec2 create-vpc-endpoint --vpc-id <allowed-vpc-id> --service-name com.amazonaws.ap-southeast-1.s3 --route-table-ids rtb-11aa22bb
 ```
+Where:
 
-- `allowed-vpc-id`: would be the one your cluster & CI server sits on
+- `allowed-vpc-id`: a VPC used by CI / k8s servers
+
+Confirm the vpc endpoint exists by reviewing the prefix lists created for the s3 service.
 
 ```bash
-# check if vpc endpoint was successfully created
-
-root@localhost$ aws ec2 describe-prefix-lists
-
+$ aws ec2 describe-prefix-lists
 {
     "PrefixLists": [
         {
@@ -80,18 +101,16 @@ root@localhost$ aws ec2 describe-prefix-lists
 }
 ```
 
-#### S3 Repository set up
+#### Setting up the S3 components for a Helm Repository
 
-To ensure the repository is only accessible internally, we [restrict s3 bucket access to a particular VPC](https://stackoverflow.com/questions/25539057/restricting-s3-bucket-access-to-a-vpc) (as Helm auth support was still in flux).
-
-Every key component is defined in code as below and takes the following parameters as variables:
+Armed with the vpc endpoint and other parameters as below, we provide Terraform snippets for the remaining key components here:
 
 - `aws_region`: The AWS Region of choice
 - `domain_name`: Internal domain name. This is a private hosted zone associated with our internal VPCs.
 - `bucket_name_prefix`: Prefix for the bucket on the internal domain.
-- `vpc_endpoint`:  A VPC endpoint which enables you to create a private connection between your VPC and another AWS service without requiring access over the Internet. We choose to pass the id in as a parameter to this module.
+- `vpc_endpoint`:  the VPC endpoint defined above. We choose to pass the id in as a parameter to this Terraform module.
 
-Here is the Terraform configuration for the bucket policy to restrict access to our private connection:
+The Terraform configuration for the bucket policy restricting access to our s3 bucket is:
 
 ```hcl
 data  "aws_iam_policy_document" "s3-read" {
@@ -121,7 +140,7 @@ data  "aws_iam_policy_document" "s3-read" {
 }
 ```
 
-The s3 Bucket itself will act as a static website:
+The s3 bucket itself acting as a static website:
 
 ```hcl
 resource "aws_s3_bucket" "charts-bucket" {
@@ -145,7 +164,7 @@ resource "aws_s3_bucket" "charts-bucket" {
 }
 ```
 
-And here is the configuration for a DNS record in our private zone:
+A CNAME record for the bucket in our private DNS zone of the private VPCs:
 
 ```hcl
 data "aws_route53_zone" "private" {
@@ -162,7 +181,7 @@ resource "aws_route53_record" "www" {
 }
 ```
 
-Note: Users who want to manage the bucket through the console, should get access with a policy similar to this
+**Note**: Users who want to manage the bucket through the console, should get access with a policy similar to this
 
 ```
 data "aws_iam_policy_document" "charts-bucket-console-access" {
@@ -190,30 +209,30 @@ data "aws_iam_policy_document" "charts-bucket-console-access" {
 }
 ```
 
-Additionally, the IAM credentials required for the CI/CD system to access the bucket can also be generated through Terraform, but have been omitted here for brevity.
+Additionally, the IAM credentials required for the CI/CD system to access the bucket can also be generated through Terraform, but this has been omitted here for brevity.
 
-#### Synchronizing central Git repo with s3 bucket
+#### Synchronizing the Charts git repository to s3
 
-The Drone pipeline task will require the following secrets:
+We wrote a Drone plugin to package, index and push Helm Charts to s3  on every change.
 
-- `AWS_ACCESS_KEY_ID`
-- `AWS_SECRET_ACCESS_KEY`
-- `AWS_DEFAULT_REGION`
+With this plugin, Drone will manage your chart repository given AWS access keys and a simple yaml snippet as below:
 
-We use a Base Image with `bash`, `awscli` and `helm`
-
-```dockerfile
-FROM alpine:3.6
-ENV HELM_VERSION 2.5.0
-RUN apk --update add py-pip bash curl tar && \
-  pip install awscli
-RUN curl -O https://storage.googleapis.com/kubernetes-helm/helm-v${HELM_VERSION}-linux-amd64.tar.gz && \
-  tar -xvf helm-v${HELM_VERSION}-linux-amd64.tar.gz && \
-  cp -rfp linux-amd64/helm /usr/local/bin/ && \
-  rm -rf linux-amd64*
+```yaml
+pipeline:
+  update_helm_repo:
+    image: quay.io/honestbee/drone-helm-repo
+    exclude: .git
+    repo_url: http://helm-charts.example.com
+    storage_url: s3://helm-charts.example.com
+    aws_region: ap-southeast-1
+    when:
+      branch: [master]
 ```
 
-Currently, we rely on the following bash script and are yet to convert it to a re-usable Drone plugin.
+Full usage details are [available here](https://github.com/honestbee/drone-helm-repo#usage)
+
+
+Alternatively, following bash script using `awscli` and `helm` will do the same:
 
 ```bash
 #!/bin/bash
@@ -235,26 +254,9 @@ echo "Syncing index.yaml and packaged charts ..."
 aws s3 sync . s3://${S3_BUCKET}/ --exclude '*' --include "*.tgz" --include "index.yaml"
 ```
 
-Given the above, our Drone pipeline becomes as follows:
-
-```yaml
-pipeline:
-  build:
-    image: registry.example.com/helm-repo-sync
-    environment:
-      - S3_BUCKET=helm-repo.example.com
-    commands:
-      - ./package.sh
-    when:
-      branch: [master]
-
-```
-
 ### Managing Helm releases with a private Chart Repository and Drone
 
-Once a Chart repository has been configured, we can use it with helm.
-
-To illustrate how we use a Helm Repository, lets go through the manual steps first.
+Once a Chart repository has been configured, using it with Helm manually looks as follows (we highlight the drone automation after).
 
 The repository has to be added to our Helm configuration:
 
@@ -262,7 +264,7 @@ The repository has to be added to our Helm configuration:
 $ helm repo add honestbee-charts https://github.com/honestbee/public-charts
 ```
 
-Next we can search for Charts:
+We can then search for Charts:
 
 ```bash
 $ helm search hello
@@ -272,7 +274,13 @@ honestbee-charts/hello-world    0.1.0   Hello World chart for testing
 local/hello-world               0.1.0   Hello World chart for testing
 ```
 
-We need to make sure our Drone deployment is running in a VPC that can access the private repository.
+and install a release of a particular chart as follows:
+
+```bash
+$ helm upgrade honestbee-charts/hello-world --install
+```
+
+**Note**: We need to make sure our Drone deployment is running in a VPC that can access the private repository.
 
 Finally, to manage Helm deployments from Drone, we can use our [forked Helm Drone plugin](https://github.com/honestbee/drone-helm#helm-kubernetes-plugin-for-droneio) - until we upstream those changes.
 
@@ -308,4 +316,4 @@ Full Usage documentation is [available in the repository](https://github.com/hon
 
 Having Helm manage the releases on Kubernetes gives us the ability to easily roll back to a previous release where every manifest related to the Kubernetes workload is versioned (including configmaps, secrets, ingress, ... ).
 
-We did not cover an important aspect in this article, which is the secrets management. But we will detail these in a separate article.
+We did not cover an important aspect in this article, which is the secrets management. But we will detail these in a future article.
